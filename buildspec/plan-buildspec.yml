@@ -1,5 +1,15 @@
 version: 0.2
 phases:
+    install:
+    runtime-versions:
+      golang: 1.x
+    commands:
+      - apt-get install -y apt-utils
+      - go version
+      - apt-get install -y curl
+      - curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
+      - apt-get update
+      - apt-get -y install terraform
   pre_build:
     commands:
       - terraform init
