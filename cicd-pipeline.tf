@@ -1,5 +1,5 @@
 resource "aws_codebuild_project" "tf-plan" {
-  name          = "tf-cicd-plan2"
+  name          = "tf-cicd-plan-jonty"
   description   = "Plan stage for terraform"
   service_role  = aws_iam_role.tf-codebuild-role.arn
 
@@ -9,13 +9,13 @@ resource "aws_codebuild_project" "tf-plan" {
 
   environment {
     compute_type                = "BUILD_GENERAL1_SMALL"
-    image                       = "hashicorp/terraform:0.14.3"
+    image                       = "aws/codebuild/standard:1.0"
     type                        = "LINUX_CONTAINER"
-    image_pull_credentials_type = "SERVICE_ROLE"
-    registry_credential{
+    image_pull_credentials_type = "CODEBUILD"
+    /*registry_credential{
         credential = var.dockerhub_credentials
         credential_provider = "SECRETS_MANAGER"
-    }
+    }*/
  }
  source {
      type   = "CODEPIPELINE"
@@ -24,7 +24,7 @@ resource "aws_codebuild_project" "tf-plan" {
 }
 
 resource "aws_codebuild_project" "tf-apply" {
-  name          = "tf-cicd-apply"
+  name          = "tf-cicd-apply-jonty"
   description   = "Apply stage for terraform"
   service_role  = aws_iam_role.tf-codebuild-role.arn
 
@@ -36,11 +36,11 @@ resource "aws_codebuild_project" "tf-apply" {
     compute_type                = "BUILD_GENERAL1_SMALL"
     image                       = "hashicorp/terraform:0.14.3"
     type                        = "LINUX_CONTAINER"
-    image_pull_credentials_type = "SERVICE_ROLE"
-    registry_credential{
+    image_pull_credentials_type = "CODEBUILD"
+    /*registry_credential{
         credential = var.dockerhub_credentials
         credential_provider = "SECRETS_MANAGER"
-    }
+    }*/
  }
  source {
      type   = "CODEPIPELINE"
@@ -51,7 +51,7 @@ resource "aws_codebuild_project" "tf-apply" {
 
 resource "aws_codepipeline" "cicd_pipeline" {
 
-    name = "tf-cicd"
+    name = "tf-cicd-jonty"
     role_arn = aws_iam_role.tf-codepipeline-role.arn
 
     artifact_store {
@@ -69,7 +69,7 @@ resource "aws_codepipeline" "cicd_pipeline" {
             version = "1"
             output_artifacts = ["tf-code"]
             configuration = {
-                FullRepositoryId = "davoclock/aws-cicd-pipeline"
+                FullRepositoryId = "jontybala/aws-cicd-pipeline"
                 BranchName   = "master"
                 ConnectionArn = var.codestar_connector_credentials
                 OutputArtifactFormat = "CODE_ZIP"
@@ -87,7 +87,7 @@ resource "aws_codepipeline" "cicd_pipeline" {
             owner = "AWS"
             input_artifacts = ["tf-code"]
             configuration = {
-                ProjectName = "tf-cicd-plan"
+                ProjectName = "tf-cicd-plan-jonty1"
             }
         }
     }
@@ -102,7 +102,7 @@ resource "aws_codepipeline" "cicd_pipeline" {
             owner = "AWS"
             input_artifacts = ["tf-code"]
             configuration = {
-                ProjectName = "tf-cicd-apply"
+                ProjectName = "tf-cicd-apply-jonty1"
             }
         }
     }
